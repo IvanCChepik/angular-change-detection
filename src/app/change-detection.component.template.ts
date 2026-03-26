@@ -1,8 +1,8 @@
 export function template(children: string = ""): string {
   return `
         {{touch}}
-     <!--   <button class="toggle-visibility" #toggle_visiblity (click.outside)="onToggleVisibility()">-</button>-->
         <header>
+        <span class="component-name">{{title}}</span>
         <span>
         <span class="tag strategy-box {{cdStrategyName}}">{{cdStrategyName}}</span>
         </span>

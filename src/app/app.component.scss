@@ -65,6 +65,47 @@
   }
 }
 
+.flag-toggles {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  align-items: center;
+
+  .flag-toggle-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f5f5f5;
+    color: #888;
+
+    &.active {
+      background: #e8f5e9;
+      border-color: #4caf50;
+      color: #2e7d32;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &.clear-btn {
+      background: #fff3e0;
+      border-color: #ff9800;
+      color: #e65100;
+
+      &:hover {
+        background: #ffe0b2;
+      }
+    }
+
+  }
+}
+
 .cd-warning {
   opacity: 0;
   background: #8aedb5;
@@ -87,5 +128,35 @@ footer {
 
   a {
     font-weight: bold;
+  }
+}
+
+.button {
+  background: linear-gradient(135deg, #d1495b, #f08a5d); // более яркий винно-коралловый градиент
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(209, 73, 91, 0.3); // заметная тень для контраста
+  border: 1px solid rgba(209, 73, 91, 0.5); // легкий контур, чтобы кнопка не сливалась
+
+  &:hover {
+    background: linear-gradient(135deg, #f08a5d, #d1495b); // инверсия градиента
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(209, 73, 91, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 12px rgba(209, 73, 91, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(240, 138, 93, 0.4); // мягкое кольцо при фокусе
   }
 }

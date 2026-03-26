@@ -6,7 +6,7 @@ import {
   ElementRef,
   inject,
   NgZone,
-  OnInit,
+  OnInit, signal,
   VERSION,
   ViewChild,
 } from "@angular/core";
@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { toCanvas } from "qrcode";
 import { Subject } from "rxjs";
 
+import { StateService } from "./abstract-change-detection.component";
 import { DirtyCheckColoringService } from "./dirty-check-coloring.service";
 import { NumberHolder } from "./number-holder";
 import { WarningService } from "./warning.service";
@@ -32,6 +33,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   public inputByVal!: number;
   public inputByRef = new NumberHolder();
   public inputObservable = new Subject<number>();
+  protected readonly showCommonOptions = signal<boolean>(false);
+
 
   @ViewChild("apptick_button", { static: true }) private _apptickButton!: ElementRef;
 
@@ -65,6 +68,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   private _propagateInZoneCheckbox!: ElementRef<HTMLInputElement>;
 
   @ViewChild("qrcode_canvas", { static: true }) private _canvas!: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild("flag_toggle", { static: true })
+  private _flagToggleButton!: ElementRef<HTMLButtonElement>;
+
+  private _stateService = inject(StateService);
 
   constructor(
     private _zone: NgZone,
@@ -140,6 +148,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   private updateInputValue(): void {
     this.value++;
     if (this.isPropagateByValue()) {
@@ -176,5 +185,23 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private isPropagateInZone(): boolean {
     return this._propagateInZoneCheckbox.nativeElement.checked;
+  }
+
+  onToggleFlags(): void {
+    this._stateService.toggleFlags();
+    const btn = this._flagToggleButton.nativeElement;
+    if (this._stateService.showFlags) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  }
+
+  onClearFlags(): void {
+    this._stateService.clearFlags();
+  }
+
+  public toggleCommonOptions(): void {
+    this.showCommonOptions.set(!this.showCommonOptions())
   }
 }

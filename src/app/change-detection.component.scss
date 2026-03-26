@@ -133,13 +133,24 @@ $collapse-button-size: 15px;
   header {
     display: flex;
     justify-content: space-between;
-    padding: 0.7rem 0.5rem;
+    align-items: center;
+    padding: 0.5rem;
     border-radius: 0.25rem 0.25rem 0 0;
     border-bottom: 1px solid var(--senary-contrast);
     background-color: var(--octonary-contrast);
     position: relative;
     z-index: 10;
     transition: border 0.3s ease;
+    gap: 4px;
+
+    .component-name {
+      font-family: var(--code-font);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #444;
+      letter-spacing: -0.02rem;
+      white-space: nowrap;
+    }
 
     h3 {
       display: inline-block;

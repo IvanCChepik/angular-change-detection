@@ -16,7 +16,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { fromEvent, Observable, Subject } from "rxjs";
+import { BehaviorSubject, fromEvent, Observable, Subject } from "rxjs";
 import { takeUntil, tap } from "rxjs/operators";
 
 import { ColorService } from "./color.service";
@@ -51,6 +51,20 @@ export abstract class AbstractChangeDetectionComponent implements AfterViewInit,
 
   public inputObservableValue!: number;
   public cdStrategyName: string;
+  public title: string;
+
+  private static readonly _titleMap = new Map<string, string[]>([
+    ["comp-1", ["1"]],
+    ["comp-1-1", ["L1"]],
+    ["comp-1-2", ["R1"]],
+    ["comp-1-x-1", ["L2", "L3"]],
+    ["comp-1-x-2", ["R2", "R3"]],
+    ["comp-1-x-1-1", ["L4", "L6"]],
+    ["comp-1-x-1-2", ["R4", "R6"]],
+    ["comp-1-x-2-1", ["L5", "L7"]],
+    ["comp-1-x-2-2", ["R5", "R7"]],
+  ]);
+  private static readonly _nameCounters = new Map<string, number>();
 
   private _hostRef = inject(ElementRef);
   private _colorService = inject(ColorService);
@@ -68,13 +82,28 @@ export abstract class AbstractChangeDetectionComponent implements AfterViewInit,
   ) {
     this.cdStrategyName = ChangeDetectionStrategy[cdStrategy];
 
+    const count = AbstractChangeDetectionComponent._nameCounters.get(name) || 0;
+    const titles = AbstractChangeDetectionComponent._titleMap.get(name);
+    this.title = titles?.[count] ?? name;
+    AbstractChangeDetectionComponent._nameCounters.set(name, count + 1);
+
     this._stateService.state$.pipe(takeUntilDestroyed()).subscribe((force) => {
       const cdStatus = this.getCdStatus(this._cd);
       if (cdStatus || force) {
-        this._ngMarked.nativeElement.innerHTML = cdStatus;
-        this._ngMarked.nativeElement.className = "";
-        this._ngMarked.nativeElement.classList.add("tag", cdStatus?.replace(" ", "-"));
+        if (this.isStatusVisible(cdStatus)) {
+          this._ngMarked.nativeElement.innerHTML = cdStatus;
+          this._ngMarked.nativeElement.className = "";
+          this._ngMarked.nativeElement.classList.add("tag", cdStatus?.replace(" ", "-"));
+        } else {
+          this._ngMarked.nativeElement.innerHTML = "";
+          this._ngMarked.nativeElement.className = "";
+        }
       }
+    });
+
+    this._stateService.clearFlags$.pipe(takeUntilDestroyed()).subscribe(() => {
+      this._ngMarked.nativeElement.innerHTML = "";
+      this._ngMarked.nativeElement.className = "";
     });
   }
 
@@ -172,6 +201,11 @@ export abstract class AbstractChangeDetectionComponent implements AfterViewInit,
     this.signal.update((v) => v + 1);
   }
 
+  private isStatusVisible(status: CdStatus): boolean {
+    if (!status) return false;
+    return this._stateService.showFlags;
+  }
+
   private getCdStatus(cdRef: ChangeDetectorRef): CdStatus {
     let lView = (cdRef as any)._lView;
     const flags: number = lView[2]; // FLAGS=2
@@ -198,9 +232,28 @@ type CdStatus = "HasChildViewsToRefresh" | "RefreshView" | "dirty" | "Consumer d
 @Injectable({ providedIn: "root" })
 export class StateService {
   private _state = new Subject<boolean>();
+  private _showFlags = new BehaviorSubject<boolean>(true);
+  private _clearFlags = new Subject<void>();
 
   public get state$(): Observable<boolean> {
     return this._state.asObservable();
+  }
+
+  public get clearFlags$(): Observable<void> {
+    return this._clearFlags.asObservable();
+  }
+
+  public get showFlags(): boolean {
+    return this._showFlags.value;
+  }
+
+  public toggleFlags(): void {
+    this._showFlags.next(!this._showFlags.value);
+    this.updateState(true);
+  }
+
+  public clearFlags(): void {
+    this._clearFlags.next();
   }
 
   public updateState(cleanup = false): void {

@@ -1,137 +1,80 @@
+<button class="button" (click)="toggleCommonOptions()">Show options</button>
+@if (showCommonOptions()) {
 <header>Angular Change Detection - based on {{ version }}</header>
-<div class="control">
-  <section class="card">
-    <header><h3>Trigger global actions</h3></header>
-    <nav>
-      <button #apptick_button (click.outside)="onTick()" text="AppRef.tick()">AppRef.tick()</button>
-      <button
-        #timeout_button
-        (click.outside)="onTimeout()"
-        text="setTimeout(...)"
-        title="Installs a timeout to run in 3s (in ng-zone)"
-      >
-        setTimeout(...)
-      </button>
-      <button #click_button (click)="clickNoop()" title="Click with a NoOp" text="Click">Click</button>
-    </nav>
-  </section>
+  <div class="control">
+    <section class="card">
+      <header><h3>Trigger global actions</h3></header>
+      <nav>
+        <button #apptick_button (click.outside)="onTick()" text="AppRef.tick()">AppRef.tick()</button>
+        <button
+          #timeout_button
+          (click.outside)="onTimeout()"
+          text="setTimeout(...)"
+          title="Installs a timeout to run in 3s (in ng-zone)"
+        >
+          setTimeout(...)
+        </button>
+        <button #click_button (click)="clickNoop()" title="Click with a NoOp" text="Click">Click</button>
+      </nav>
+    </section>
 
-  <section class="card">
-    <header><h3>Control dirty check coloring</h3></header>
-    <nav>
-      <label>
-        <input type="checkbox" #auto_clear checked (change.outside)="onAutoCheckboxChange($event)" />Clear dirty check
-        coloring automatically
-      </label>
-      <span class="filler"></span>
-      <button #clear (click.outside)="onClear()" text="Clear">Clear</button>
-    </nav>
-  </section>
+    <section class="card">
+      <header><h3>Control dirty check coloring</h3></header>
+      <nav>
+        <label>
+          <input type="checkbox" #auto_clear checked (change.outside)="onAutoCheckboxChange($event)" />Clear dirty check
+          coloring automatically
+        </label>
+        <span class="filler"></span>
+        <button #clear (click.outside)="onClear()" text="Clear">Clear</button>
+      </nav>
+    </section>
 
-  <section class="card">
-    <header>
-      <h3>Play with component input - current value: <span #input_value_field>n/a</span></h3>
-    </header>
-    <nav>
-      <button #trigger_change (click.outside)="onChange()" text="Trigger change">Trigger change</button>
-      <label
+    <section class="card">
+      <header>
+        <h3>Play with component input - current value: <span #input_value_field>n/a</span></h3>
+      </header>
+      <nav>
+        <button #trigger_change (click.outside)="onChange()" text="Trigger change">Trigger change</button>
+        <label
         ><input
           type="checkbox"
           #propagate_by_value_checkbox
           checked
           title="Provides the new value as a new object (ref-change)"
         />change input object (ref-change)</label
-      >
-      <label
+        >
+        <label
         ><input
           type="checkbox"
           #propagate_by_ref_checkbox
           checked
           title="Provides the new value by mutating the input object (no-ref-change)"
         />mutate input object (no ref-change)</label
-      >
-      <label
+        >
+        <label
         ><input
           type="checkbox"
           #propagate_by_observable_checkbox
           checked
           title="Publishes the new value via Observable"
         />via Observable (no ref-change)</label
-      >
-      <label><input type="checkbox" #propagate_in_zone_checkbox checked />Propagate in Angular zone</label>
-    </nav>
-  </section>
+        >
+        <label><input type="checkbox" #propagate_in_zone_checkbox checked />Propagate in Angular zone</label>
+      </nav>
+    </section>
+  </div>
+}
+
+
+<div class="flag-toggles">
+  <button class="flag-toggle-btn active" #flag_toggle (click.outside)="onToggleFlags()" text="Show LView Flags">Show LView Flags</button>
+  <button class="flag-toggle-btn clear-btn" (click.outside)="onClearFlags()" text="Clear Flags">Clear Flags</button>
 </div>
 
 <div class="cd-warning" (click.outside)="onTick()">Remember to trigger <i>tick()</i> to fire CD</div>
 
 <main>
   <app-comp-1 [inputByVal]="inputByVal" [inputByRef]="inputByRef" [inputObservable]="inputObservable"></app-comp-1>
-
-  <section class="card">
-    <header><h3>Change detection details</h3></header>
-    <article>
-      <ul>
-        <li>
-          Event listeners in templates (like click) will mark the ancestors as dirty. This is why OnPush parents still
-          run change detection on click. (<a
-            href="https://github.com/angular/angular/blob/7c8f026778b1486a4fc9cde21d8806e044618e89/packages/core/src/render3/instructions/listener.ts#L249"
-            >See implementation</a
-          >)
-        </li>
-        <li>Mark for check won't fire a CD cycle, this is done by the scheduler (currently NgZone)</li>
-        <li>Signal updates won't fire a CD cycle, this is done by the scheduler (currently NgZone)</li>
-        <li>Signal updates will mark the component as a dirty consummer & all ancestor as traversal</li>
-      </ul>
-    </article>
-  </section>
-
-  <div class="explanation">
-    <section class="card">
-      <header><h3>Good readings</h3></header>
-      <ul>
-        <li>
-          <a
-            href="https://angularindepth.com/posts/1053/everything-you-need-to-know-about-change-detection-in-angular"
-            target="_blank"
-            >Everything you need to know about change detection in Angular</a
-          >
-        </li>
-        <li>
-          <a
-            href="https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html"
-            target="_blank"
-            >ANGULAR CHANGE DETECTION EXPLAINED</a
-          >
-        </li>
-        <li>
-          <a href="https://medium.com/@antoniopk/angular-change-detection-explained-169aea595423" target="_blank">
-            Change Detection Fundamentals in Angular
-          </a>
-        </li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <header><h3>Credit</h3></header>
-      <article>
-        <p>
-          This project is forked from
-          <a href="https://github.com/danielwiehl/edu-angular-change-detection">Daniel Wiehl's CD demo</a>. I'd like to
-          thank him for his initial work.
-        </p>
-        <p>
-          You can find this current demo
-          <a href="https://github.com/jeanmeche/angular-change-detection">On my repo</a>.
-        </p>
-
-        <p>QR Code to this page:</p>
-        <canvas #qrcode_canvas></canvas>
-      </article>
-    </section>
-  </div>
-  <footer>
-    Try also the 👉 <a href="https://jeanmeche.github.io/angular-compiler-output/">Angular Template Compiler output demo</a> 👈
-  </footer>
 </main>
 
