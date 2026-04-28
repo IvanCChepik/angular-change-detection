@@ -1,6 +1,6 @@
 import { ElementRef, Injectable, NgZone } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { delay, delayWhen, distinctUntilChanged, take } from "rxjs/operators";
+import { BehaviorSubject, Observable } from "rxjs";
+import { delay, distinctUntilChanged, filter, switchMap, take } from "rxjs/operators";
 import { DelayedScheduler } from "./delayed-scheduler.service";
 
 /**
@@ -8,7 +8,7 @@ import { DelayedScheduler } from "./delayed-scheduler.service";
  */
 @Injectable({ providedIn: "root" })
 export class DirtyCheckColoringService {
-  private _clearColoring$ = new Subject<void>();
+  private _clearGeneration$ = new BehaviorSubject<number>(0);
   private _autoClearColoring = true;
   private _busy$ = new BehaviorSubject<boolean>(false);
 
@@ -22,7 +22,7 @@ export class DirtyCheckColoringService {
   ) {}
 
   public clearColoring(): void {
-    this._clearColoring$.next();
+    this._clearGeneration$.next(this._clearGeneration$.value + 1);
   }
 
   public setAutoClearColoring(autoClear: boolean): void {
@@ -37,6 +37,7 @@ export class DirtyCheckColoringService {
     this._zone.runOutsideAngular(() => {
       const element = elementRef.nativeElement;
       const cssClass = "dirty-check";
+      const startGen = this._clearGeneration$.value;
       this._delayedScheduler.schedule(() => {
         element.classList.add(cssClass);
       });
@@ -55,7 +56,12 @@ export class DirtyCheckColoringService {
         this._delayedScheduler.done$
           .pipe(
             take(1), // subscribe once
-            delayWhen(() => this._clearColoring$),
+            switchMap(() =>
+              this._clearGeneration$.pipe(
+                filter((gen) => gen > startGen),
+                take(1),
+              ),
+            ),
           )
           .subscribe(() => {
             element.classList.remove(cssClass);

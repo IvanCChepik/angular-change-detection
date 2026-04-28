@@ -70,6 +70,13 @@
 <div class="flag-toggles">
   <button class="flag-toggle-btn active" #flag_toggle (click.outside)="onToggleFlags()" text="Show LView Flags">Show LView Flags</button>
   <button class="flag-toggle-btn clear-btn" (click.outside)="onClearFlags()" text="Clear Flags">Clear Flags</button>
+  <span class="filler"></span>
+  <button
+    #freeze_button
+    class="flag-toggle-btn freeze-btn"
+    title="Click to keep highlights on forever"
+    (click.outside)="toggleFreeze()"
+  >Freeze flicks</button>
 </div>
 
 <div class="cd-warning" (click.outside)="onTick()">Remember to trigger <i>tick()</i> to fire CD</div>

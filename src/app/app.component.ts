@@ -34,6 +34,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   public inputByRef = new NumberHolder();
   public inputObservable = new Subject<number>();
   protected readonly showCommonOptions = signal<boolean>(false);
+  private _isFrozen = false;
 
 
   @ViewChild("apptick_button", { static: true }) private _apptickButton!: ElementRef;
@@ -71,6 +72,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   @ViewChild("flag_toggle", { static: true })
   private _flagToggleButton!: ElementRef<HTMLButtonElement>;
+
+  @ViewChild("freeze_button", { static: true })
+  private _freezeButton!: ElementRef<HTMLButtonElement>;
 
   private _stateService = inject(StateService);
 
@@ -203,5 +207,25 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   public toggleCommonOptions(): void {
     this.showCommonOptions.set(!this.showCommonOptions())
+  }
+
+  public toggleFreeze(): void {
+    this._isFrozen = !this._isFrozen;
+    this._dirtyCheckColoringService.setAutoClearColoring(!this._isFrozen);
+    if (!this._isFrozen) {
+      document
+        .querySelectorAll(".dirty-check")
+        .forEach((el) => el.classList.remove("dirty-check"));
+    }
+    const btn = this._freezeButton.nativeElement;
+    if (this._isFrozen) {
+      btn.classList.add("active");
+      btn.textContent = "Unfreeze flicks";
+      btn.title = "Click to resume normal fading";
+    } else {
+      btn.classList.remove("active");
+      btn.textContent = "Freeze flicks";
+      btn.title = "Click to keep highlights on forever";
+    }
   }
 }
